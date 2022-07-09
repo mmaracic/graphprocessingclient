@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'io.spring.dependency-management' version "1.0.11.RELEASE"
+    id 'org.springframework.boot' version '2.6.8'
+}
+
+group 'hr.mmaracic.graphprocessing'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //neo4j
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
