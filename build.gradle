@@ -24,6 +24,7 @@ dependencies {
     testImplementation("org.neo4j.test:neo4j-harness:${neo4jVersion}") {
         exclude group:'org.slf4j', module:'slf4j-nop'
     }
+    testImplementation 'org.neo4j.procedure:apoc:4.4.0.5:all'
 }
 
 test {
