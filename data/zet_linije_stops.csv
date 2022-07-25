@@ -1,0 +1,365 @@
+Linija,Stanica,Trajanje
+1,Zapadni kolodvor,0
+1,Trg dr. F. Tuđmana,2
+1,Britanski trg,4
+1,Frankopanska,6
+1,Trg bana J. Jelačića,9
+1,Trg hrvatskih velikana,12
+1,Trg žrtava fašizma,14
+1,Šubićeva,16
+1,Tuškanova,17
+1,Heinzelova,18
+1,Šulekova,19
+1,Harambašićeva,20
+1,Svetice,21
+1,Borongaj,23
+2,Črnomerec,0
+2,Sveti Duh,3
+2,Mandaličina,4
+2,Slovenska,5
+2,Trg dr. F. Tuđmana,8
+2,Talovčeva,9
+2,Adžijina,11
+2,Vodnikova,15
+2,Botanički vrt,17
+2,Glavni kolodvor,19
+2,Branimirova,21
+2,Branimirova tržnica,24
+2,Autobusni kolodvor,26
+2,Držićeva,28
+2,Olipska,29
+2,Radnička,31
+2,Heinzelova,33
+2,Donje Svetice,34
+2,Ivanićgradska,36
+2,Ferenščica,37
+2,Getaldićeva,38
+2,Čavićeva,40
+2,Žitnjak,41
+2,Elka,43
+2,Munja,44
+2,Zagreb. transporti,45
+2,Savišće,45
+3,Ljubljanica,0
+3,Selska,2
+3,Nehajska,4
+3,Trešnjevački trg,5
+3,Badalićeva,8
+3,Tehnički muzej,9
+3,Studentski centar,10
+3,Zagrepčanka,12
+3,Vrbik,14
+3,Sveučilišna al.,16
+3,Miramarska,18
+3,Lisinski,20
+3,Kruge,21
+3,Strojarska,22
+3,Držićeva,25
+3,Olipska,26
+3,Radnička,27
+3,Heinzelova,29
+3,Donje Svetice,31
+3,Ivanićgradska,32
+3,Ferenščica,33
+3,Getaldićeva,34
+3,Čavićeva,36
+3,Žitnjak,38
+3,Elka,39
+3,Munja,40
+3,Zagreb. transporti,41
+3,Savišće,42
+4,Savski most,0
+4,Veslačka,2
+4,Prisavlje,3
+4,Vjesnik,6
+4,Učiteljski fakultet,8
+4,Zagrepčanka,11
+4,Studentski centar,13
+4,Vodnikova,14
+4,Botanički vrt,16
+4,Glavni kolodvor,18
+4,Branimirova,20
+4,Sheraton,22
+4,Kl. za traum.,24
+4,Draškovićeva,26
+4,Vončinina,27
+4,Petrova,29
+4,Kvaternikov trg,31
+4,Mašićeva,32
+4,Jordanovac,34
+4,Park Maksimir,35
+4,Hondlova,37
+4,Ravnice,38
+4,Dubrava,41
+4,Ljubijska,43
+4,Kapucinska,44
+4,Grižanska,45
+4,Dankovečka,46
+4,Čulinečka,47
+4,Aleja javora,49
+4,Poljanice IV,49
+4,Dubec,52
+5,Prečko,0
+5,Slavenskog,2
+5,M. Radev,3
+5,Petrovaradinska,4
+5,Vrbani,7
+5,Hrvatskog sokola,9
+5,Jarun,11
+5,Srednjaci,14
+5,Horvati,15
+5,Knežija,16
+5,St. dom S. Radić,18
+5,Veslačka,20
+5,Prisavlje,21
+5,Vjesnik,24
+5,Učiteljski fakultet,26
+5,Zagrepčanka,30
+5,Vrbik,32
+5,Sveučilišna al.,33
+5,Miramarska,34
+5,Lisinski,35
+5,Kruge,37
+5,Strojarska,38
+5,Držićeva,40
+5,Autobusni kolodvor,42
+5,Trg Petra Krešimira IV,45
+5,Šubićeva,47
+5,Tržnica Kvatrić,49
+5,Mašićeva,54
+5,Jordanovac,55
+5,Park Maksimir,57
+5,Hondlova,59
+5,Ravnice,60
+5,Dubrava,63
+6,Črnomerec,0
+6,Sveti Duh,3
+6,Mandaličina,4
+6,Slovenska,5
+6,Trg dr. F. Tuđmana,8
+6,Britanski trg,9
+6,Frankopanska,11
+6,Trg bana J. Jelačića,15
+6,Zrinjevac,17
+6,Glavni kolodvor,19
+6,Branimirova,21
+6,Branimirova tržnica,24
+6,Autobusni kolodvor,26
+6,Držićeva,28
+6,Slavonska,29
+6,Folnegovićevo naselje,31
+6,Borovje,32
+6,Most mladosti,33
+6,Zapruđe,34
+6,Zapruđe,35
+6,Utrina,37
+6,Središće,38
+6,Sopot,40
+7,Savski most,0
+7,St. dom S. Radić,2
+7,Arena Zagreb,4
+7,Savski gaj,6
+7,Trnsko,7
+7,Velesajam,9
+7,Muzej suv.umjetnosti,11
+7,Sopot,13
+7,Središće,15
+7,Utrina,16
+7,Zapruđe,17
+7,Zapruđe,18
+7,Most mladosti,19
+7,Borovje,22
+7,Folnegovićevo naselje,23
+7,Slavonska,24
+7,Držićeva,27
+7,Autobusni kolodvor,29
+7,Trg Petra Krešimira IV,32
+7,Šubićeva,34
+7,Tržnica Kvatrić,36
+7,Mašićeva,41
+7,Jordanovac,42
+7,Park Maksimir,44
+7,Hondlova,46
+7,Ravnice,47
+7,Dubrava,50
+7,Ljubijska,51
+7,Kapucinska,52
+7,Grižanska,53
+7,Dankovečka,55
+7,Čulinečka,56
+7,Aleja javora,57
+7,Poljanice IV,58
+7,Dubec,60
+8,Mihaljevac,0
+8,Jandrićeva,2
+8,Radićevo šetalište,4
+8,Gupčeva zvijezda,6
+8,Belostenčeva,8
+8,Grškovićeva,9
+8,Draškovićeva,13
+8,Kl. za traum.,14
+8,Sheraton,15
+8,Branimirova tržnica,18
+8,Autobusni kolodvor,19
+8,Držićeva,20
+8,Slavonska,22
+8,Folnegovićevo naselje,24
+8,Borovje,25
+8,Most mladosti,28
+8,Zapruđe,29
+9,Ljubljanica,0
+9,Selska,2
+9,Nehajska,4
+9,Trešnjevački trg,7
+9,Badalićeva,9
+9,Tehnički muzej,11
+9,Vodnikova,14
+9,Botanički vrt,15
+9,Glavni kolodvor,18
+9,Branimirova,19
+9,Sheraton,22
+9,Trg žrtava fašizma,23
+9,Šubićeva,26
+9,Tuškanova,27
+9,Heinzelova,28
+9,Šulekova,29
+9,Harambašićeva,30
+9,Svetice,32
+9,Borongaj,34
+11,Črnomerec,0
+11,Sveti Duh,2
+11,Mandaličina,4
+11,Slovenska,5
+11,Trg dr. F. Tuđmana,7
+11,Britanski trg,8
+11,Frankopanska,10
+11,Trg bana J. Jelačića,14
+11,Draškovićeva,17
+11,Vončinina,18
+11,Petrova,19
+11,Kvaternikov trg,21
+11,Mašićeva,23
+11,Jordanovac,24
+11,Park Maksimir,26
+11,Hondlova,29
+11,Ravnice,30
+11,Dubrava,34
+11,Ljubijska,36
+11,Kapucinska,37
+11,Grižanska,38
+11,Dankovečka,39
+11,Čulinečka,41
+11,Aleja javora,43
+11,Poljanice IV,44
+11,Dubec,46
+12,Ljubljanica,0
+12,Selska,2
+12,Nehajska,4
+12,Trešnjevački trg,6
+12,Badalićeva,8
+12,Tehnički muzej,10
+12,Vodnikova,12
+12,Trg Republike Hrvatske,14
+12,Frankopanska,16
+12,Trg bana J. Jelačića,19
+12,Draškovićeva,22
+12,Vončinina,23
+12,Petrova,24
+12,Kvaternikov trg,26
+12,Mašićeva,28
+12,Jordanovac,29
+12,Park Maksimir,31
+12,Hondlova,34
+12,Ravnice,35
+12,Dubrava,39
+13,Žitnjak,0
+13,Čavićeva,1
+13,Getaldićeva,3
+13,Ferenščica,4
+13,Ivanićgradska,5
+13,Donje Svetice,7
+13,Heinzelova,9
+13,Radnička,12
+13,Olipska,13
+13,Držićeva,15
+13,Strojarska,17
+13,Kruge,18
+13,Lisinski,21
+13,Miramarska,22
+13,Sveučilišna al.,24
+13,Zagrepčanka,26
+13,Studentski centar,28
+13,Vodnikova,30
+13,Trg Republike Hrvatske,32
+13,Frankopanska,34
+13,Trg bana J. Jelačića,37
+13,Zrinjevac,39
+13,Glavni kolodvor,41
+13,Branimirova,43
+13,Sheraton,46
+13,Trg žrtava fašizma,47
+13,Šubićeva,49
+13,Tržnica Kvatrić,51
+13,Kvaternikov trg,52
+14,Mihaljevac,0
+14,Jandrićeva,2
+14,Radićevo šetalište,4
+14,Gupčeva zvijezda,6
+14,Belostenčeva,8
+14,Grškovićeva,10
+14,Draškovićeva,13
+14,Trg bana J. Jelačića,16
+14,Frankopanska,19
+14,Trg Republike Hrvatske,21
+14,Vodnikova,22
+14,Studentski centar,24
+14,Zagrepčanka,26
+14,Učiteljski fakultet,27
+14,Vjesnik,28
+14,Prisavlje,30
+14,Veslačka,31
+14,St. dom S. Radić,32
+14,Arena Zagreb,35
+14,Savski gaj,36
+14,Trnsko,38
+14,Velesajam,39
+14,Muzej suv.umjetnosti,41
+14,Sopot,43
+14,Središće,44
+14,Utrina,46
+14,Zapruđe,46
+15,Mihaljevac,0
+15,Gračanske stube,2
+15,Gračanski Mihaljevac,4
+15,Gračani,5
+15,Gračansko dolje,6
+17,Prečko,0
+17,Slavenskog,2
+17,M. Radev,3
+17,Petrovaradinska,4
+17,Vrbani,7
+17,Hrvatskog sokola,9
+17,Jarun,11
+17,Srednjaci,14
+17,Horvati,15
+17,Knežija,16
+17,St. dom S. Radić,18
+17,Veslačka,20
+17,Prisavlje,21
+17,Vjesnik,24
+17,Učiteljski fakultet,25
+17,Zagrepčanka,29
+17,Studentski centar,31
+17,Vodnikova,32
+17,Trg Republike Hrvatske,34
+17,Frankopanska,36
+17,Trg bana J. Jelačića,39
+17,Trg hrvatskih velikana,42
+17,Trg žrtava fašizma,43
+17,Šubićeva,46
+17,Tuškanova,47
+17,Heinzelova,49
+17,Šulekova,50
+17,Harambašićeva,51
+17,Svetice,53
+17,Borongaj,54
