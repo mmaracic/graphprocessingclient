@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,27 +36,27 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     private LineNodeRepository lineNodeRepository;
 
     @Test
-    void shouldRetrieveStops() throws FileNotFoundException {
+    void shouldRetrieveStops() throws IOException {
         loadData();
         List<StopNode> stops = stopNodeRepository.findAll();
         assertThat(stops.size(), equalTo(116));
     }
 
     @Test
-    void shouldRetrieveLines() throws FileNotFoundException {
+    void shouldRetrieveLines() throws IOException {
         loadData();
         List<LineNode> lines = lineNodeRepository.findAll();
         assertThat(lines.size(), equalTo(15));
     }
 
     @Test
-    void checkConnections() throws FileNotFoundException {
+    void checkConnections() throws IOException {
         loadData();
         List<StopNode> nodes = stopNodeRepository.findAll();
         assertThat(nodes.stream().map(StopNode::getStopProperties).allMatch(sp -> !sp.isEmpty()), Matchers.is(true));
     }
 
-    private void loadData() throws FileNotFoundException {
+    private void loadData() throws IOException {
         int version = 1;
         List<LineEntry> entries = csvDataService.getCsvData("data/zet_linije_stops.csv");
         graphDataService.saveStopsAndLines(entries, version);

@@ -8,7 +8,7 @@ import hr.mmaracic.graphpr.repository.StopNodeRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class GraphDataServiceTest {
     private final GraphDataService graphDataService = new GraphDataService(lineNodeRepository, stopNodeRepository);
 
     @Test
-    public void testGraphStorage() throws FileNotFoundException {
+    public void testGraphStorage() throws IOException {
 
         Mockito.when(lineNodeRepository.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
         Mockito.when(stopNodeRepository.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
@@ -42,7 +42,7 @@ public class GraphDataServiceTest {
     }
 
     @Test
-    public void testGraphGeneration() throws FileNotFoundException {
+    public void testGraphGeneration() throws IOException {
         int version = 1;
         List<LineEntry> entries = dataService.getCsvData("data/zet_linije_stops.csv");
         assertThat(entries.size(), equalTo(364));
