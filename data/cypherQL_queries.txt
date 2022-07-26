@@ -1,0 +1,8 @@
+#If we dont want to execute a command, just to see the plan prepend it by EXPLAIN
+#If we want to execute a command and to see the plan prepend it by PROFILE
+
+#Stops that belong to a line
+MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(n:Stop) RETURN paths
+
+#Find path between two stops in line 3
+MATCH path=(l:Line{id: 3})-[:CONTAINS]->(pol:Stop{name:'Nehajska'})-[:NEXT*{lineId:3, mainDirection:true}]-(pod:Stop{name: 'Žitnjak'}) RETURN path
