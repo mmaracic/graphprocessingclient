@@ -6,3 +6,12 @@ MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(n:Stop) RETURN paths
 
 #Find path between two stops in line 3
 MATCH path=(l:Line{id: 3})-[:CONTAINS]->(pol:Stop{name:'Nehajska'})-[:NEXT*{lineId:3, mainDirection:true}]-(pod:Stop{name: 'Žitnjak'}) RETURN path
+
+#Find one path between two stops
+MATCH path=(pol:Stop{name:'Nehajska'})-[:NEXT*]-(pod:Stop{name: 'Žitnjak'}) RETURN reduce(data=[], n in nodes(path) | data + n.name) limit 1
+
+#Find path between two stops with no repeated stops - for more than 1 runs endlessly
+MATCH path=(pol:Stop{name:'Nehajska'})-[:NEXT*]-(pod:Stop{name: 'Žitnjak'}) WITH reduce(data=[], n in nodes(path) | data + n.name) as path_stops WHERE apoc.coll.different(path_stops) return path_stops limit 1
+
+#Calculate dijkstra with thw ewo stops - runs endlessly
+MATCH (pol:Stop{name:'Nehajska'}), (pod:Stop{name: 'Žitnjak'}) WITH pol, pod CALL apoc.algo.dijkstraWithDefaultWeight(pol, pod, 'NEXT', '', 1) YIELD path, weight RETURN path, weight limit 1
