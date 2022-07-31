@@ -1,0 +1,8 @@
+spring:
+  neo4j:
+    uri: neo4j+s://e7813870.databases.neo4j.io
+    security:
+      encrypted: true
+    authentication:
+      username: neo4j
+      password: zrLHXsBbSQ0fCzpOpiFabYDIM6bdS7y_D5zSc9G8B7c
