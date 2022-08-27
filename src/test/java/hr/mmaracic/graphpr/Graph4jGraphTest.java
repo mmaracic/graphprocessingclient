@@ -1,5 +1,6 @@
 package hr.mmaracic.graphpr;
 
+import hr.mmaracic.graphpr.dao.StopNodeDao;
 import hr.mmaracic.graphpr.model.csv.LineEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
@@ -8,6 +9,7 @@ import hr.mmaracic.graphpr.repository.StopNodeRepository;
 import hr.mmaracic.graphpr.service.CsvDataService;
 import hr.mmaracic.graphpr.service.GraphDataService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +37,9 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     @Autowired
     private LineNodeRepository lineNodeRepository;
 
+    @Autowired
+    private StopNodeDao stopNodeDao;
+
     @Test
     void shouldRetrieveStops() throws IOException {
         loadData();
@@ -54,6 +59,21 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
         loadData();
         List<StopNode> nodes = stopNodeRepository.findAll();
         assertThat(nodes.stream().map(StopNode::getStopProperties).allMatch(sp -> !sp.isEmpty()), Matchers.is(true));
+    }
+
+    @Test
+    @Disabled("Returns 0 results")
+    void checkFullTextSearchWithScore() throws IOException {
+        loadData();
+        List<StopNodeDao.NodeFullTextResult> results = stopNodeDao.queryFullTextIndex("trg");
+        assertThat(results.size(), Matchers.is(9));
+    }
+
+    @Test
+    void checkFullTextSearch() throws IOException {
+        loadData();
+        List<StopNode> results = stopNodeRepository.fulltextQueryByName("trg");
+        assertThat(results.size(), Matchers.is(9));
     }
 
     private void loadData() throws IOException {
