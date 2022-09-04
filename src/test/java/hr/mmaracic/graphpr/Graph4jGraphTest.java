@@ -9,7 +9,6 @@ import hr.mmaracic.graphpr.repository.StopNodeRepository;
 import hr.mmaracic.graphpr.service.CsvDataService;
 import hr.mmaracic.graphpr.service.GraphDataService;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,7 +61,6 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     }
 
     @Test
-    @Disabled("Returns 0 results")
     void checkFullTextSearchWithScore() throws IOException {
         loadData();
         List<StopNodeDao.NodeFullTextResult> results = stopNodeDao.queryFullTextIndex("trg");
