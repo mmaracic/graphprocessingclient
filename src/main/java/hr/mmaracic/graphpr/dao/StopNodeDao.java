@@ -25,7 +25,7 @@ public class StopNodeDao {
     }
 
     public void createFullTextIndex() {
-        client.getQueryRunner().run("CREATE FULLTEXT INDEX StopNameTextIndex FOR (s:Stop) ON EACH [s.name]").stream();
+        client.getQueryRunner().run("CREATE FULLTEXT INDEX StopNameTextIndex IF NOT EXISTS FOR (s:Stop) ON EACH [s.name]").stream();
     }
 
     public List<NodeFullTextResult> queryFullTextIndex(String namePart) {
