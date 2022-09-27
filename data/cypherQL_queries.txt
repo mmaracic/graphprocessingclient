@@ -94,3 +94,8 @@ RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) |
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'})
 CALL apoc.algo.allSimplePaths(pol,pod,'NEXT', 40) yield path as path
 RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) | data + n.name) limit 10
+
+#Expand config for NEXT works with limit but gives all same results
+MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'})
+CALL apoc.path.expandConfig(pol,{maxlevel:30, relationshipFilter:'NEXT', uniqueness:'NODE_GLOBAL', terminatorNodes: [pod]}) yield path as path
+RETURN pol.name, size(nodes(path)), length(path) AS hops, pod.name, reduce(data=[], n in nodes(path) | data + n.name)
