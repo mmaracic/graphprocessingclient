@@ -1,64 +1,64 @@
-#If we dont want to execute a command, just to see the plan prepend it by EXPLAIN
-#If we want to execute a command and to see the plan prepend it by PROFILE
+//If we dont want to execute a command, just to see the plan prepend it by EXPLAIN
+//If we want to execute a command and to see the plan prepend it by PROFILE
 
-#delete all
+//delete all
 MATCH (n)
 DETACH DELETE n
 
-#Stops that belong to a line
+//Stops that belong to a line
 MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(n:Stop) RETURN paths
 
-#Find path between two stops in line 3
+//Find path between two stops in line 3
 MATCH path=(l:Line{id: 3})-[:CONTAINS]->(pol:Stop{name:'Nehajska'})-[:NEXT*{lineId:3, mainDirection:true}]-(pod:Stop{name: 'Žitnjak'}) RETURN path
 
-#Find one path between two stops
+//Find one path between two stops
 MATCH path=(pol:Stop{name:'Nehajska'})-[:NEXT*]-(pod:Stop{name: 'Žitnjak'}) RETURN reduce(data=[], n in nodes(path) | data + n.name) limit 1
 
-#Find path between two stops with no repeated stops - for more than 1 runs endlessly
+//Find path between two stops with no repeated stops - for more than 1 runs endlessly
 MATCH path=(pol:Stop{name:'Nehajska'})-[:NEXT*]-(pod:Stop{name: 'Žitnjak'}) WITH reduce(data=[], n in nodes(path) | data + n.name) as path_stops WHERE apoc.coll.different(path_stops) return path_stops limit 1
 
-#Calculate dijkstra with thw ewo stops - runs endlessly
+//Calculate dijkstra with thw ewo stops - runs endlessly
 MATCH (pol:Stop{name:'Nehajska'}), (pod:Stop{name: 'Žitnjak'}) WITH pol, pod CALL apoc.algo.dijkstraWithDefaultWeight(pol, pod, 'NEXT', '', 1) YIELD path, weight RETURN path, weight limit 1
 
-#Create index on stop name
+//Create index on stop name
 CREATE INDEX stopName IF NOT EXISTS FOR (s:Stop) ON (s.name);
 
-#return stops with count of unique neighbours <> 2 - hubs
+//return stops with count of unique neighbours <> 2 - hubs
 MATCH (s:Stop) WITH s, apoc.coll.toSet([(s)-->(t:Stop) | t.name]) AS neighbours
 WHERE SIZE(neighbours) <> 2 RETURN s.name, neighbours
 
-#set hub label
+//set hub label
 MATCH (s:Stop) WITH s, apoc.coll.toSet([(s)-->(t:Stop) | t.name]) AS neighbours
 WHERE SIZE(neighbours) <> 2 SET s:Hub
 
-#Connectinh hubs stop by stop not taking lines in account not calculated in reasonable time
+//Connectinh hubs stop by stop not taking lines in account not calculated in reasonable time
 MATCH path=(pol:Hub)-[:NEXT*]->(pod:Hub) WITH reduce(data=[], n in nodes(path) | data + n.name) as path_stops WHERE apoc.coll.different(path_stops) RETURN path_stops limit 1
 
-#Connecting hubs via specific lines
-#There are 2 different Heinzelova stops
+//Connecting hubs via specific lines
+//There are 2 different Heinzelova stops
 MATCH (l:Line)-[:CONTAINS]->(h1:Hub) MATCH (l:Line)-[:CONTAINS]->(h2:Hub) WHERE h1.name <> h2.name
 RETURN l.id, h1.name, h2.name ORDER BY l.id, h1.name, h2.name
 
-#creating index for properties
+//creating index for properties
 CREATE INDEX rel_next_lineId FOR ()-[r:NEXT]-() ON (r.lineId)
 
-#creating line connections on hubs
-#have to use indexes
-#greedy, will find all paths, not only for first neighbours, have to use directions to limit greed
+//creating line connections on hubs
+//have to use indexes
+//greedy, will find all paths, not only for first neighbours, have to use directions to limit greed
 MATCH path=(l:Line{id:3})-[CONTAINS]->(pol:Hub)-[:NEXT*1..{lineId: l.id}]->(pod:Hub) RETURN l.id, pol.name, pod.name
 
-#counting paths in a hub
+//counting paths in a hub
 MATCH path=(l:Line{id:3})-[CONTAINS]->(pol:Hub)-[:NEXT*1..{lineId: l.id}]->(pod:Hub)
 WITH l, pol, pod, reduce(count=0, n in nodes(path) | count + apoc.convert.toInteger(apoc.coll.contains(apoc.node.labels(n), 'Hub'))) as hub_count
 RETURN l.id, pol.name, pod.name, hub_count
 
-#finding immediate hub neighbours in all directions - 229 results in 60.5sec local
+//finding immediate hub neighbours in all directions - 229 results in 60.5sec local
 MATCH path=(l:Line)-[CONTAINS]->(pol:Hub)-[:NEXT*1..{lineId: l.id}]->(pod:Hub)
 WITH l, pol, pod, reduce(count=0, n in nodes(path) | count + apoc.convert.toInteger(apoc.coll.contains(apoc.node.labels(n), 'Hub'))) as hub_count
 WHERE hub_count = 2 AND pol.name <> pod.name
 RETURN l.id, pol.name, pod.name, hub_count
 
-#connecting immediate hub neighbours in all directions, 40 nodes in 107 (was 60.5 string join expensive?) sec local
+//connecting immediate hub neighbours in all directions, 40 nodes in 107 (was 60.5 string join expensive?) sec local
 MATCH path=(l:Line)-[CONTAINS]->(pol:Hub)-[:NEXT*1..{lineId: l.id}]->(pod:Hub)
 WITH l, pol, pod, reduce(count=0, n in nodes(path) | count + apoc.convert.toInteger(apoc.coll.contains(apoc.node.labels(n), 'Hub'))) as hub_count
 WHERE hub_count = 2 AND pol.name <> pod.name
@@ -67,82 +67,124 @@ ON CREATE SET segment.lines = [l.id]
 ON MATCH SET segment.lines = apoc.coll.toSet(segment.lines + l.id)
 MERGE (pol) -[:FOLLOWS]-> (segment) -[:FOLLOWS]-> (pod)
 
-#generic path searching, not working
+//generic path searching, not working
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'}),
 path=(pol)-[:FOLLOWS*]->(pod)
 WHERE  apoc.coll.containsDuplicates(nodes(path)) = false
 RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) | data + n.name) limit 1
 
-#Generic path searching with limited hops works great event without a limit for FOLLOWS, 19 results size 13-21
+//Generic path searching with limited hops works great event without a limit for FOLLOWS, 19 results size 13-21
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'}),
 path=(pol)-[:FOLLOWS*1..20]->(pod)
 WHERE  apoc.coll.containsDuplicates(nodes(path)) = false
 RETURN pol.name, pod.name, size(nodes(path)) as size, reduce(data=[], n in nodes(path) | data + n.name) as path
 ORDER BY size
 
-#Shortest path works great for FOLLOWS - 13 nodes
+//Shortest path works great for FOLLOWS - 13 nodes
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'}),
 path = shortestPath((pol)-[:FOLLOWS*]-(pod))
 RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) | data + n.name)
 
-#Shortest path works great for NEXT - 26 nodes
+//Shortest path works great for NEXT - 26 nodes
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'}),
 path = shortestPath((pol)-[:NEXT*]-(pod))
 RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) | data + n.name)
 
-#All simple paths for NEXT works with limit but gives all same results
+//All simple paths for NEXT works with limit but gives all same results
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'})
 CALL apoc.algo.allSimplePaths(pol,pod,'NEXT', 40) yield path as path
 RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) | data + n.name) limit 10
 
-#Expand config for NEXT works with limit but gives all same results
+//Expand config for NEXT works with limit but gives all same results
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'})
 CALL apoc.path.expandConfig(pol,{maxLevel:30, relationshipFilter:'NEXT', uniqueness:'NODE_GLOBAL', terminatorNodes: [pod]}) yield path as path
 RETURN pol.name, size(nodes(path)), length(path) AS hops, pod.name, reduce(data=[], n in nodes(path) | data + n.name)
 
-#----------------------------------------------------------------------------
-# LINE APPROACH
-#----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// LINE APPROACH
+//----------------------------------------------------------------------------
 
-#Lines that intersect
+//Lines that intersect
 MATCH path=(l1:Line)-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(l2:Line)
 WHERE l1.id <> l2.id
 RETURN l1.id, l2.id, stop.name
 ORDER BY l1.id, l2.id
 
-#Create links between different lines - created 174 relationships
+//Create links between different lines - created 174 relationships
 MATCH path=(l1:Line)-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(l2:Line)
 WHERE l1.id <> l2.id
-MERGE (l1) -[:LINKED]-> (l2)
+MERGE (l1) -[:LINKED]-> (l2);
 
-#Create links from line to itself - 15 links
+//Create links from line to itself - 15 links
 MATCH path=(l1:Line)
-MERGE (l1) -[:LINKED]-> (l1)
+MERGE (l1) -[:LINKED]-> (l1);
 
-#Search how to reach destination
+//delete replationships
+MATCH p=()-[r:LINKED]->() detach delete r;
+
+//Search how to reach destination with unlimited hops
 MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*]-> (l2:Line)
 RETURN l1.id, l2.id, reduce(data=[], l in nodes(path) | data + l.id) as lines LIMIT 1
 
-#Search how to reach destination - doesnt work * is killing us
+//Search how to reach destination - unlimited hops - doesnt work * is killing us
 MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*]-> (l2:Line)
 WITH l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
 WHERE size(lines)<3
 RETURN l1.id, l2.id, lines
 
-#Search how to reach destination with limited line hopping from 0 to 2
+//Search how to reach destination with limited line hopping from 0 to 2
 MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
-RETURN DISTINCT l1.id, l2.id, apoc.coll.dropDuplicateNeighbors(reduce(data=[], l in nodes(path) | data + l.id)) as lines
+WITH l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
+WHERE apoc.coll.containsDuplicates(lines) = false
+RETURN l1.id, l2.id,lines
 ORDER BY size(lines), l1.id, l2.id
 
-#Identify where we hop
-MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Slavonska'})
+//Identify where we hop - problem with direct lines
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
-WITH l1, l2, apoc.coll.dropDuplicateNeighbors(reduce(data=[], l in nodes(path) | data + l.id)) as lines
+WITH l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
+WHERE apoc.coll.containsDuplicates(lines) = false
 UNWIND apoc.coll.pairsMin(lines) as pair
-MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
-WITH l1, l2, lines, collect(stop.name) as stops
-RETURN DISTINCT l1.id, l2.id, lines, stops
+//hop stops
+CALL {
+    WITH pair
+    MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
+    RETURN {lines: pair, stop: stop.name} AS stop LIMIT 1
+}
+WITH l1, l2, lines, collect(stop) as stops
+RETURN l1.id, l2.id, lines, stops
+ORDER BY size(lines), l1.id, l2.id
+
+//Identify where we hop AND calculate duration
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
+MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
+WITH pol, pod, l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
+WHERE apoc.coll.containsDuplicates(lines) = false
+UNWIND apoc.coll.pairsMin(lines) as pair
+//hop stops
+CALL {
+    WITH pair
+    MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
+    RETURN {lines: pair, stop: stop.name} AS stop LIMIT 1
+}
+WITH pol, pod, l1, l2, lines, collect(stop) as stops
+//first segment duration
+CALL {
+    WITH pol, stops[0] as hub, hub.lines[0] lId
+    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: pol.name})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hub.stop})
+    WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
+    RETURN duration as d1
+}
+//last segment duration
+CALL {
+    WITH pod, stops[size(stops)-1] as hub, hub.lines[1] lId
+    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: hub.stop})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: pod.name})
+    WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
+    RETURN duration as d1
+}
+
+RETURN l1.id, l2.id, lines, stops
 ORDER BY size(lines), l1.id, l2.id
