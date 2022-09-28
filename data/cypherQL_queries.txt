@@ -142,17 +142,17 @@ WHERE apoc.coll.containsDuplicates(lines) = false
 RETURN l1.id, l2.id,lines
 ORDER BY size(lines), l1.id, l2.id
 
-//Identify where we hop - problem with direct lines
+//Identify where we hop
 MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
 WITH l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
 WHERE apoc.coll.containsDuplicates(lines) = false
-UNWIND apoc.coll.pairsMin(lines) as pair
+UNWIND range(0, size(lines)-1) AS i
 //hop stops
 CALL {
-    WITH pair
-    MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
-    RETURN {lines: pair, stop: stop.name} AS stop LIMIT 1
+    WITH lines, i
+    OPTIONAL MATCH (lt1:Line{id: lines[i]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: lines[i+1]})
+    RETURN {lines: [lines[i], lines[i+1]], stop: stop.name} AS stop LIMIT 1
 }
 WITH l1, l2, lines, collect(stop) as stops
 RETURN l1.id, l2.id, lines, stops
@@ -163,28 +163,33 @@ MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAI
 MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
 WITH pol, pod, l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
 WHERE apoc.coll.containsDuplicates(lines) = false
-UNWIND apoc.coll.pairsMin(lines) as pair
+UNWIND range(0, size(lines)-1) AS i
 //hop stops
 CALL {
-    WITH pair
-    MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
-    RETURN {lines: pair, stop: stop.name} AS stop LIMIT 1
+    WITH pod, lines, i
+    OPTIONAL MATCH (lt1:Line{id: lines[i]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: lines[i+1]})
+    RETURN {lines: [lines[i], lines[i+1]], stop: CASE stop.name WHEN null THEN pod.name ELSE stop.name END} AS stop LIMIT 1
 }
-WITH pol, pod, l1, l2, lines, collect(stop) as stops
+WITH pol, l1, l2, lines, collect(stop) as stops
 //first segment duration
 CALL {
-    WITH pol, stops[0] as hub, hub.lines[0] lId
+    WITH pol, stops
+    WITH pol, stops[0] AS hub
+    WITH pol, hub,  hub.lines[0] AS lId
     MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: pol.name})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hub.stop})
     WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
     RETURN duration as d1
 }
-//last segment duration
+//other segments including last
+UNWIND range(1, size(stops)-1) AS i
 CALL {
-    WITH pod, stops[size(stops)-1] as hub, hub.lines[1] lId
-    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: hub.stop})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: pod.name})
+    WITH stops, i
+    WITH stops[i] AS hubCur, stops[i-1] AS hubPrev
+    WITH hubCur, hubPrev, hubCur.lines[0] AS lId
+    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: hubPrev.stop})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hubCur.stop})
     WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
-    RETURN duration as d1
+    RETURN duration as dRest
 }
 
-RETURN l1.id, l2.id, lines, stops
+RETURN l1.id, l2.id, lines, stops, d1, dRest
 ORDER BY size(lines), l1.id, l2.id
