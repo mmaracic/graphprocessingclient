@@ -97,5 +97,52 @@ RETURN pol.name, pod.name, size(nodes(path)), reduce(data=[], n in nodes(path) |
 
 #Expand config for NEXT works with limit but gives all same results
 MATCH (pol:Stop{name:'Ljubljanica'}), (pod:Stop{name:'Savišće'})
-CALL apoc.path.expandConfig(pol,{maxlevel:30, relationshipFilter:'NEXT', uniqueness:'NODE_GLOBAL', terminatorNodes: [pod]}) yield path as path
+CALL apoc.path.expandConfig(pol,{maxLevel:30, relationshipFilter:'NEXT', uniqueness:'NODE_GLOBAL', terminatorNodes: [pod]}) yield path as path
 RETURN pol.name, size(nodes(path)), length(path) AS hops, pod.name, reduce(data=[], n in nodes(path) | data + n.name)
+
+#----------------------------------------------------------------------------
+# LINE APPROACH
+#----------------------------------------------------------------------------
+
+#Lines that intersect
+MATCH path=(l1:Line)-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(l2:Line)
+WHERE l1.id <> l2.id
+RETURN l1.id, l2.id, stop.name
+ORDER BY l1.id, l2.id
+
+#Create links between different lines - created 174 relationships
+MATCH path=(l1:Line)-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(l2:Line)
+WHERE l1.id <> l2.id
+MERGE (l1) -[:LINKED]-> (l2)
+
+#Create links from line to itself - 15 links
+MATCH path=(l1:Line)
+MERGE (l1) -[:LINKED]-> (l1)
+
+#Search how to reach destination
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
+MATCH path = (l1:Line) -[:LINKED*]-> (l2:Line)
+RETURN l1.id, l2.id, reduce(data=[], l in nodes(path) | data + l.id) as lines LIMIT 1
+
+#Search how to reach destination - doesnt work * is killing us
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
+MATCH path = (l1:Line) -[:LINKED*]-> (l2:Line)
+WITH l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
+WHERE size(lines)<3
+RETURN l1.id, l2.id, lines
+
+#Search how to reach destination with limited line hopping from 0 to 2
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
+MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
+RETURN DISTINCT l1.id, l2.id, apoc.coll.dropDuplicateNeighbors(reduce(data=[], l in nodes(path) | data + l.id)) as lines
+ORDER BY size(lines), l1.id, l2.id
+
+#Identify where we hop
+MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Slavonska'})
+MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
+WITH l1, l2, apoc.coll.dropDuplicateNeighbors(reduce(data=[], l in nodes(path) | data + l.id)) as lines
+UNWIND apoc.coll.pairsMin(lines) as pair
+MATCH (lt1:Line{id: pair[0]})-[:CONTAINS]->(stop:Stop)<-[:CONTAINS]-(lt2:Line{id: pair[1]})
+WITH l1, l2, lines, collect(stop.name) as stops
+RETURN DISTINCT l1.id, l2.id, lines, stops
+ORDER BY size(lines), l1.id, l2.id
