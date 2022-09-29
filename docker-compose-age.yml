@@ -1,0 +1,17 @@
+#from adminer user server:"age:5432", usename:postgres password:example
+
+version: '3'
+services:
+  age:
+    image: apache/age:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5433:5432"
+
+  age-adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080

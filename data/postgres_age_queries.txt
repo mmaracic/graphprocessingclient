@@ -1,0 +1,37 @@
+#initialising extension on docker database
+CREATE EXTENSION age;
+LOAD 'age';
+SET search_path = ag_catalog, "$user", public;
+--GRANT USAGE ON SCHEMA ag_catalog TO db_user;
+
+#creating graph
+SELECT * FROM ag_catalog.create_graph('graph_name');
+
+#dropping graph
+SELECT * FROM ag_catalog.drop_graph('graph_name', true);
+
+#executing query
+#Cypher() executes the cypher query passed as an argument.
+#cypher(graph_name, query_string, parameters)
+#Cypher may not be used as part of an expression, use a subquery instead.
+#Calling Cypher in the SELECT clause as an independent column is not allowed. However Cypher may be used when it belongs as a conditional.
+
+#Example
+#SELECT * FROM cypher('graph_name', $$
+#/* Cypher Query Here */
+#$$) AS (result1 agtype, result2 agtype);
+
+#Sample1
+SELECT * FROM cypher('graph_name', $$
+CREATE (:Person {name: 'John'}),
+       (:Person {name: 'Jeff'}),
+       (:Person {name: 'Joan'}),
+       (:Person {name: 'Bill'})
+$$) AS (result agtype);
+
+#Sample2
+SELECT * FROM cypher('graph_name', $$
+	MATCH (v:Person)
+	WHERE v.name STARTS WITH "J"
+	RETURN v.name
+$$) AS (names agtype);
