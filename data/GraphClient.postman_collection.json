@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "5f76b85a-19fd-4640-b3b5-079e22cbb48f",
+		"name": "GraphClient",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:9090/load",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:9090/load",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"load"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9090/truncate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:9090/truncate",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"truncate"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
