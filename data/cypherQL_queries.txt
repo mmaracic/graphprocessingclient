@@ -8,6 +8,9 @@ DETACH DELETE n
 //Stops that belong to a line
 MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(n:Stop) RETURN paths
 
+//Line section
+MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(pol:Stop{name:'Ljubljanica'})-[:NEXT*{lineId:l.id}]->(pod:Stop{name: 'Nehajska'}) RETURN paths limit 1
+
 //Find path between two stops in line 3
 MATCH path=(l:Line{id: 3})-[:CONTAINS]->(pol:Stop{name:'Nehajska'})-[:NEXT*{lineId:3, mainDirection:true}]-(pod:Stop{name: 'Žitnjak'}) RETURN path
 
@@ -158,7 +161,7 @@ WITH l1, l2, lines, collect(stop) as stops
 RETURN l1.id, l2.id, lines, stops
 ORDER BY size(lines), l1.id, l2.id
 
-//Identify where we hop AND calculate duration
+//Identify where we hop AND calculate duration - case with one line error
 MATCH (pol:Stop{name: 'Nehajska'}) <-[:CONTAINS]- (l1:Line), (l2:Line) -[:CONTAINS]-> (pod:Stop{name: 'Žitnjak'})
 MATCH path = (l1:Line) -[:LINKED*0..2]-> (l2:Line)
 WITH pol, pod, l1, l2, reduce(data=[], l in nodes(path) | data + l.id) as lines
@@ -176,9 +179,10 @@ CALL {
     WITH pol, stops
     WITH pol, stops[0] AS hub
     WITH pol, hub,  hub.lines[0] AS lId
-    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: pol.name})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hub.stop})
-    WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
-    RETURN duration as d1
+    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: pol.name}),(s2:Stop{name: hub.stop})<-[:CONTAINS]-(lt1:Line{id: lId}),
+    path = shortestPath((s1)-[:NEXT*]-(s2))
+    WITH path, reduce(duration=0, r in relationships(path) | duration + r.transitTime) as duration
+    RETURN duration as d1 LIMIT 1
 }
 //other segments including last
 UNWIND range(1, size(stops)-1) AS i
@@ -186,10 +190,11 @@ CALL {
     WITH stops, i
     WITH stops[i] AS hubCur, stops[i-1] AS hubPrev
     WITH hubCur, hubPrev, hubCur.lines[0] AS lId
-    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: hubPrev.stop})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hubCur.stop})
-    WITH rels, reduce(duration=0, r in rels | duration + r.transitTime) as duration
-    RETURN duration as dRest
+    MATCH (lt1:Line{id: lId})-[:CONTAINS]->(s1:Stop{name: hubPrev.stop})-[rels:NEXT*{lineId: lId}]->(s2:Stop{name: hubCur.stop})<-[:CONTAINS]-(lt1:Line{id: lId}),
+    path = shortestPath((s1)-[:NEXT*]-(s2))
+    WITH path, reduce(duration=0, r in relationships(path) | duration + r.transitTime) as duration
+    RETURN duration as dRest LIMIT 1
 }
 
-RETURN l1.id, l2.id, lines, stops, d1, dRest
-ORDER BY size(lines), l1.id, l2.id
+RETURN l1.id, l2.id, lines, stops, d1, collect(dRest), apoc.coll.sum(d1 + collect(dRest)) AS distance
+ORDER BY distance, size(lines), l1.id, l2.id
