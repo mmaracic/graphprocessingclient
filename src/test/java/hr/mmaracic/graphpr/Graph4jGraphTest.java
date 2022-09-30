@@ -1,6 +1,6 @@
 package hr.mmaracic.graphpr;
 
-import hr.mmaracic.graphpr.dao.StopNodeDao;
+import hr.mmaracic.graphpr.dao.neo4j.StopNodeDao;
 import hr.mmaracic.graphpr.model.csv.LineEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;

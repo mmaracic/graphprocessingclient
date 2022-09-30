@@ -1,4 +1,4 @@
-package hr.mmaracic.graphpr.dao;
+package hr.mmaracic.graphpr.dao.neo4j;
 
 import lombok.RequiredArgsConstructor;
 import org.neo4j.driver.Query;

@@ -1,6 +1,7 @@
 package hr.mmaracic.graphpr.dao;
 
 import hr.mmaracic.graphpr.AbstractGraph4jTest;
+import hr.mmaracic.graphpr.dao.neo4j.PathDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
