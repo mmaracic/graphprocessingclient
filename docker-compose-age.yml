@@ -10,8 +10,15 @@ services:
     ports:
       - "5433:5432"
 
+  age-viewer:
+    build: ./age/viewer
+    image: mmaracic/age-viewer:v1.0
+    ports:
+      - "8082:3001"
+    stdin_open: true #required so that container wouldn't immediately exit
+
   age-adminer:
     image: adminer
     restart: always
     ports:
-      - 8081:8080
+      - "8081:8080"
