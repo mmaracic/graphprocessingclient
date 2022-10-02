@@ -1,4 +1,4 @@
-#from adminer user server:"age:5432", usename:postgres password:example
+#from adminer user server:"age:5432", username:postgres, password:example, database: <none>
 
 version: '3'
 services:

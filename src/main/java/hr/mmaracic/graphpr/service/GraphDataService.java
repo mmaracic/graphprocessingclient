@@ -5,42 +5,18 @@ import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.LineProperties;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.model.graph.StopProperties;
-import hr.mmaracic.graphpr.repository.LineNodeRepository;
-import hr.mmaracic.graphpr.repository.StopNodeRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
-@Transactional
-@RequiredArgsConstructor
-public class GraphDataService {
+public interface GraphDataService {
 
-    private final LineNodeRepository lineNodeRepository;
+    void deleteStopsAndLines();
 
-    private final StopNodeRepository stopNodeRepository;
+    void saveStopsAndLines(List<LineEntry> entries, int version);
 
-    public void deleteStopsAndLines() {
-        lineNodeRepository.deleteAll();
-        stopNodeRepository.deleteAll();
-    }
-
-    public void saveStopsAndLines(List<LineEntry> entries, int version) {
-        Set<StopNode> stops = extractStops(entries);
-        stopNodeRepository.saveAll(stops);
-
-        List<LineNode> lines = extractLineNodes(entries, stops, version);
-        lineNodeRepository.saveAll(lines);
-
-        addNextStopsToStopsAndLines(entries, stops, version);
-        stopNodeRepository.saveAll(stops);
-    }
-
-    public Set<StopNode> extractStops(List<LineEntry> entries) {
+    default Set<StopNode> extractStops(List<LineEntry> entries) {
         return entries.stream().map(e -> {
             StopNode sn = new StopNode();
             sn.setName(e.getStopName());
@@ -48,7 +24,7 @@ public class GraphDataService {
         }).collect(Collectors.toSet());
     }
 
-    public void addNextStopsToStopsAndLines(List<LineEntry> entries, Set<StopNode> stops, int version) {
+    default void addNextStopsToStopsAndLines(List<LineEntry> entries, Set<StopNode> stops, int version) {
         for (int i = 0; i < entries.size() - 1; i++) {
             LineEntry currentEntry = entries.get(i);
             LineEntry nextEntry = entries.get(i + 1);
@@ -76,7 +52,7 @@ public class GraphDataService {
         }
     }
 
-    public List<LineNode> extractLineNodes(List<LineEntry> entries, Set<StopNode> stops, int version) {
+    default List<LineNode> extractLineNodes(List<LineEntry> entries, Set<StopNode> stops, int version) {
         return entries.stream().collect(Collectors.groupingBy(LineEntry::getLineId, Collectors.toList()))
                 .entrySet().stream().map(e -> {
                     LineNode ln = new LineNode();
@@ -94,7 +70,7 @@ public class GraphDataService {
                 }).collect(Collectors.toList());
     }
 
-    private StopNode getStopNode(Set<StopNode> stops, String stopName) {
+    default StopNode getStopNode(Set<StopNode> stops, String stopName) {
         return stops.stream().filter(s -> s.getName().equals(stopName)).findFirst().orElseThrow();
     }
 }

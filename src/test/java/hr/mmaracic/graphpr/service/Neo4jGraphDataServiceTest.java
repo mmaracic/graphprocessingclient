@@ -5,6 +5,7 @@ import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.repository.LineNodeRepository;
 import hr.mmaracic.graphpr.repository.StopNodeRepository;
+import hr.mmaracic.graphpr.service.neo4j.Neo4jGraphDataService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,24 +18,24 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 
-public class GraphDataServiceTest {
+class Neo4jGraphDataServiceTest {
 
     private final CsvDataService dataService = new CsvDataService();
 
     private final LineNodeRepository lineNodeRepository = Mockito.mock(LineNodeRepository.class);
     private final StopNodeRepository stopNodeRepository = Mockito.mock(StopNodeRepository.class);
 
-    private final GraphDataService graphDataService = new GraphDataService(lineNodeRepository, stopNodeRepository);
+    private final Neo4jGraphDataService neo4jGraphDataService = new Neo4jGraphDataService(lineNodeRepository, stopNodeRepository);
 
     @Test
-    public void testGraphStorage() throws IOException {
+    void testGraphStorage() throws IOException {
 
         Mockito.when(lineNodeRepository.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
         Mockito.when(stopNodeRepository.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         int version = 1;
         List<LineEntry> entries = dataService.getCsvData("data/zet_linije_stops.csv");
-        graphDataService.saveStopsAndLines(entries, version);
+        neo4jGraphDataService.saveStopsAndLines(entries, version);
 
         Mockito.verify(lineNodeRepository, Mockito.times(1)).saveAll(anyList());
         Mockito.verify(stopNodeRepository, Mockito.times(1)).saveAll(anySet());
@@ -42,18 +43,18 @@ public class GraphDataServiceTest {
     }
 
     @Test
-    public void testGraphGeneration() throws IOException {
+    void testGraphGeneration() throws IOException {
         int version = 1;
         List<LineEntry> entries = dataService.getCsvData("data/zet_linije_stops.csv");
         assertThat(entries.size(), equalTo(364));
 
-        Set<StopNode> stopNodes = graphDataService.extractStops(entries);
+        Set<StopNode> stopNodes = neo4jGraphDataService.extractStops(entries);
         assertThat(stopNodes.size(), equalTo(116));
 
-        List<LineNode> lineNodes = graphDataService.extractLineNodes(entries, stopNodes, version);
+        List<LineNode> lineNodes = neo4jGraphDataService.extractLineNodes(entries, stopNodes, version);
         assertThat(lineNodes.size(), equalTo(15));
 
-        graphDataService.addNextStopsToStopsAndLines(entries, stopNodes, version);
+        neo4jGraphDataService.addNextStopsToStopsAndLines(entries, stopNodes, version);
         assertThat(
                 stopNodes.stream().map(StopNode::getStopProperties).filter(List::isEmpty).count(),
                 equalTo(0L)

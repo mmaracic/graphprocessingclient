@@ -7,7 +7,7 @@ import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.repository.LineNodeRepository;
 import hr.mmaracic.graphpr.repository.StopNodeRepository;
 import hr.mmaracic.graphpr.service.CsvDataService;
-import hr.mmaracic.graphpr.service.GraphDataService;
+import hr.mmaracic.graphpr.service.neo4j.Neo4jGraphDataService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     private CsvDataService csvDataService;
 
     @Autowired
-    private GraphDataService graphDataService;
+    private Neo4jGraphDataService neo4jGraphDataService;
 
     @Autowired
     private StopNodeRepository stopNodeRepository;
@@ -77,7 +77,7 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     private void loadData() throws IOException {
         int version = 1;
         List<LineEntry> entries = csvDataService.getCsvData("data/zet_linije_stops.csv");
-        graphDataService.saveStopsAndLines(entries, version);
+        neo4jGraphDataService.saveStopsAndLines(entries, version);
     }
 
 }
