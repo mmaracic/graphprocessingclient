@@ -32,9 +32,13 @@ public class AgeGraphDataService implements GraphDataService {
         ageDao.saveAll(stops);
 
         List<LineNode> lines = extractLineNodes(entries, stops, version);
-        //lineNodeRepository.saveAll(lines);
+        ageDao.saveAll(lines);
 
         addNextStopsToStopsAndLines(entries, stops, version);
-        //stopNodeRepository.saveAll(stops);
+        ageDao.saveAll(stops);
+    }
+
+    public String embedCypherQuery(String graphName, String query, Integer paramCount) {
+        return ageDao.embedCypherQuery(graphName, query, paramCount);
     }
 }

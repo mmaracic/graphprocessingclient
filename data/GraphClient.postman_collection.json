@@ -40,6 +40,39 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "localhost:9090/age/embed?graphName=graph&paramCount=1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "MATCH paths=(l:Line{id: 3})-[:CONTAINS]-(n:Stop) RETURN paths"
+				},
+				"url": {
+					"raw": "localhost:9090/age/embed?graphName=graph&paramCount=1",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"age",
+						"embed"
+					],
+					"query": [
+						{
+							"key": "graphName",
+							"value": "graph"
+						},
+						{
+							"key": "paramCount",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
