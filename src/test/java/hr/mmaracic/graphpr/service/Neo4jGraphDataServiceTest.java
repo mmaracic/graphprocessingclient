@@ -38,7 +38,7 @@ class Neo4jGraphDataServiceTest {
         neo4jGraphDataService.saveStopsAndLines(entries, version);
 
         Mockito.verify(lineNodeRepository, Mockito.times(1)).saveAll(anyList());
-        Mockito.verify(stopNodeRepository, Mockito.times(1)).saveAll(anySet());
+        Mockito.verify(stopNodeRepository, Mockito.times(2)).saveAll(anySet());
 
     }
 
@@ -49,7 +49,7 @@ class Neo4jGraphDataServiceTest {
         assertThat(entries.size(), equalTo(364));
 
         Set<StopNode> stopNodes = neo4jGraphDataService.extractStops(entries);
-        assertThat(stopNodes.size(), equalTo(116));
+        assertThat(stopNodes.size(), equalTo(117));
 
         List<LineNode> lineNodes = neo4jGraphDataService.extractLineNodes(entries, stopNodes, version);
         assertThat(lineNodes.size(), equalTo(15));

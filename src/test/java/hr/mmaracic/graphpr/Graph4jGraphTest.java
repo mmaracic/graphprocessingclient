@@ -12,6 +12,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @Transactional
 @SpringBootTest
+@ActiveProfiles("neo4j")
 class Graph4jGraphTest extends AbstractGraph4jTest {
 
     @Autowired
@@ -43,7 +45,7 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
     void shouldRetrieveStops() throws IOException {
         loadData();
         List<StopNode> stops = stopNodeRepository.findAll();
-        assertThat(stops.size(), equalTo(116));
+        assertThat(stops.size(), equalTo(117));
     }
 
     @Test

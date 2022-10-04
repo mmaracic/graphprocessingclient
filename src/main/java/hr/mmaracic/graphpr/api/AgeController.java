@@ -2,9 +2,11 @@ package hr.mmaracic.graphpr.api;
 
 import hr.mmaracic.graphpr.service.age.AgeGraphDataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Profile("age")
 @RequestMapping("age")
 @RequiredArgsConstructor
 public class AgeController {

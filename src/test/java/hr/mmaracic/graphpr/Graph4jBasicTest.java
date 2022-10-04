@@ -5,6 +5,7 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Transactional
 @SpringBootTest
+@ActiveProfiles("neo4j")
 class Graph4jBasicTest extends AbstractGraph4jTest{
 
     @Autowired
