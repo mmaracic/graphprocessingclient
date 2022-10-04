@@ -9,10 +9,7 @@ import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.model.graph.StopProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.*;
 import org.postgresql.util.PGobject;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +48,7 @@ public class AgeDao {
     private final PreparedStatementCallback<Integer> noResultCallback = ps -> {
 
         log.info(ps.toString());
+        ps.executeQuery();
         return 1;
     };
 
@@ -101,6 +100,7 @@ public class AgeDao {
                 StopNode existingStop = executeStatement(GRAPH, findNodeWithRelationships(STOP_LABEL, Map.of(NAME_PROPERTY, sn.getName()), STOP_LABEL, NEXT_RELATIONSHIP), stopRelationshipCallback);
                 existingProperties = existingStop.getStopProperties();
             } catch (DataAccessException dataAccessException) {
+                //error acceptable when no path found - atype conversion error
                 log.error(dataAccessException.getMessage());
             }
             for (StopProperties sp : sn.getStopProperties()) {
@@ -109,10 +109,14 @@ public class AgeDao {
                             GRAPH,
                             createRelationship(STOP_LABEL, Map.of(NAME_PROPERTY, sn.getName()), STOP_LABEL, Map.of(NAME_PROPERTY, sp.getNextStop().getName()), NEXT_RELATIONSHIP),
                             noResultCallback);
+                    executeStatement(
+                            GRAPH,
+                            createRelationship(STOP_LABEL, Map.of(NAME_PROPERTY, sp.getNextStop().getName()), STOP_LABEL, Map.of(NAME_PROPERTY, sn.getName()), NEXT_RELATIONSHIP),
+                            noResultCallback);
                 }
             }
         });
-        return (List<StopNode>) executeStatement(GRAPH, findNodes(STOP_LABEL), stopListCallback).values();
+        return new ArrayList<>(executeStatement(GRAPH, findNodes(STOP_LABEL), stopListCallback).values());
     }
 
     public List<LineNode> saveAll(List<LineNode> lineNodes) {
@@ -137,9 +141,9 @@ public class AgeDao {
 
     private Statement findNodeWithRelationships(String labelFrom, Map<String, Object> fromProperties, String labelTo, String relationshipType) {
 
-        //ToDo query works in neo4j but not in age, some kind of agtype conversion error
-        Relationship r = Cypher.node(labelFrom).withProperties(fromProperties).relationshipBetween(Cypher.node(labelTo), relationshipType);
-        return Cypher.match(r).returning(r).build();
+        Node n = Cypher.node(labelFrom).withProperties(fromProperties);
+        Relationship r = n.relationshipBetween(Cypher.node(labelTo), relationshipType);
+        return Cypher.match(r).returning(n).build();
     }
 
     private Statement dropNodes(String label) {
@@ -157,7 +161,7 @@ public class AgeDao {
     private Statement createRelationship(String labelFrom, Map<String, Object> fromProperties, String labelTo, Map<String, Object> toProperties, String relationshipType) {
 
         Relationship r = Cypher.node(labelFrom).withProperties(fromProperties)
-                .relationshipBetween(Cypher.node(labelTo).withProperties(toProperties), relationshipType);
+                .relationshipTo(Cypher.node(labelTo).withProperties(toProperties), relationshipType);
         return Cypher.create(r).build();
     }
 
