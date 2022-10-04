@@ -33,6 +33,7 @@ public class AgeDao {
     public static final String LINE_LABEL = "Line";
 
     public static final String NEXT_RELATIONSHIP = "NEXT";
+    public static final String CONTAINS_RELATIONSHIP = "CONTAINS";
     public static final String GRAPH = "graph";
 
     public static final String NAME_PROPERTY = "name";
@@ -52,7 +53,7 @@ public class AgeDao {
         return 1;
     };
 
-    private final PreparedStatementCallback<StopNode> stopRelationshipCallback = ps  -> {
+    private final PreparedStatementCallback<StopNode> stopRelationshipCallback = ps -> {
 
         log.info(ps.toString());
         StopNode stopNode = new StopNode();
@@ -122,7 +123,12 @@ public class AgeDao {
     public List<LineNode> saveAll(List<LineNode> lineNodes) {
         return lineNodes.stream().
                 map(ln -> {
-                    executeStatement(GRAPH, createNode(STOP_LABEL, Map.of(ID_PROPERTY, ln.getId())), noResultCallback);
+                    executeStatement(GRAPH, createNode(LINE_LABEL, Map.of(ID_PROPERTY, ln.getId())), noResultCallback);
+                    ln.getLineProperties().forEach(lp -> executeStatement(
+                            GRAPH,
+                            createRelationship(LINE_LABEL, Map.of(ID_PROPERTY, ln.getId()), STOP_LABEL, Map.of(NAME_PROPERTY, lp.getStop().getName()), CONTAINS_RELATIONSHIP),
+                            noResultCallback)
+                    );
                     return ln;
                 })
                 .collect(Collectors.toList());
