@@ -1,12 +1,14 @@
 package hr.mmaracic.graphpr.service;
 
 import hr.mmaracic.graphpr.model.csv.LineEntry;
+import hr.mmaracic.graphpr.model.csv.VoyageEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.LineProperties;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.model.graph.StopProperties;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,7 +16,7 @@ public interface GraphDataService {
 
     void deleteStopsAndLines();
 
-    void saveStopsAndLines(List<LineEntry> entries, int version);
+    void saveStopsAndLines(List<LineEntry> lineEntryList, List<VoyageEntry> voyageEntryList, int version);
 
     default Set<StopNode> extractStops(List<LineEntry> entries) {
         return entries.stream().map(e -> {
@@ -52,11 +54,16 @@ public interface GraphDataService {
         }
     }
 
-    default List<LineNode> extractLineNodes(List<LineEntry> entries, Set<StopNode> stops, int version) {
-        return entries.stream().collect(Collectors.groupingBy(LineEntry::getLineId, Collectors.toList()))
+    default List<LineNode> extractLineNodes(List<LineEntry> lineEntryList, List<VoyageEntry> voyageEntryList, Set<StopNode> stops, int version) {
+        Map<Long, List<VoyageEntry>> voyageEntryMap = voyageEntryList.stream().collect(Collectors.groupingBy(VoyageEntry::getLineId, Collectors.toList()));
+        return lineEntryList.stream().collect(Collectors.groupingBy(LineEntry::getLineId, Collectors.toList()))
                 .entrySet().stream().map(e -> {
                     LineNode ln = new LineNode();
                     ln.setId(e.getKey());
+                    ln.setAdditionalProperties(
+                            voyageEntryMap.get(e.getKey()).stream()
+                                    .collect(Collectors.toMap(VoyageEntry::getPeriod, VoyageEntry::getFrequencyMin))
+                    );
                     ln.setLineProperties(
                             e.getValue().stream().map(le -> {
                                 StopNode stopNode = getStopNode(stops, le.getStopName());

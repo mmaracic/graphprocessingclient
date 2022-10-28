@@ -1,12 +1,14 @@
 package hr.mmaracic.graphpr.model.graph;
 
 import lombok.Data;
+import org.springframework.data.neo4j.core.schema.CompositeProperty;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Data
@@ -15,6 +17,9 @@ public class LineNode {
 
     @Id
     private Long id;
+
+    @CompositeProperty
+    private Map<String, Object> additionalProperties;
 
     @Relationship(type = "CONTAINS", direction = Relationship.Direction.OUTGOING)
     private List<LineProperties> lineProperties = new ArrayList<>();

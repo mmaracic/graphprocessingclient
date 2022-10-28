@@ -1,6 +1,7 @@
 package hr.mmaracic.graphpr.service;
 
 import hr.mmaracic.graphpr.model.csv.LineEntry;
+import hr.mmaracic.graphpr.model.csv.VoyageEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.repository.LineNodeRepository;
@@ -34,8 +35,9 @@ class Neo4jGraphDataServiceTest {
         Mockito.when(stopNodeRepository.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
 
         int version = 1;
-        List<LineEntry> entries = dataService.getCsvData("data/zet_linije_stops.csv");
-        neo4jGraphDataService.saveStopsAndLines(entries, version);
+        List<LineEntry> lineEntryList = dataService.getCsvLineEntries("data/zet_linije_stops.csv");
+        List<VoyageEntry> voyageEntries = dataService.getCsvVoyageEntries("data/zet_linije_voyages.csv");
+        neo4jGraphDataService.saveStopsAndLines(lineEntryList, voyageEntries, version);
 
         Mockito.verify(lineNodeRepository, Mockito.times(1)).saveAll(anyList());
         Mockito.verify(stopNodeRepository, Mockito.times(2)).saveAll(anySet());
@@ -45,16 +47,17 @@ class Neo4jGraphDataServiceTest {
     @Test
     void testGraphGeneration() throws IOException {
         int version = 1;
-        List<LineEntry> entries = dataService.getCsvData("data/zet_linije_stops.csv");
-        assertThat(entries.size(), equalTo(364));
+        List<LineEntry> lineEntryList = dataService.getCsvLineEntries("data/zet_linije_stops.csv");
+        List<VoyageEntry> voyageEntries = dataService.getCsvVoyageEntries("data/zet_linije_voyages.csv");
+        assertThat(lineEntryList.size(), equalTo(364));
 
-        Set<StopNode> stopNodes = neo4jGraphDataService.extractStops(entries);
+        Set<StopNode> stopNodes = neo4jGraphDataService.extractStops(lineEntryList);
         assertThat(stopNodes.size(), equalTo(117));
 
-        List<LineNode> lineNodes = neo4jGraphDataService.extractLineNodes(entries, stopNodes, version);
+        List<LineNode> lineNodes = neo4jGraphDataService.extractLineNodes(lineEntryList, voyageEntries, stopNodes, version);
         assertThat(lineNodes.size(), equalTo(15));
 
-        neo4jGraphDataService.addNextStopsToStopsAndLines(entries, stopNodes, version);
+        neo4jGraphDataService.addNextStopsToStopsAndLines(lineEntryList, stopNodes, version);
         assertThat(
                 stopNodes.stream().map(StopNode::getStopProperties).filter(List::isEmpty).count(),
                 equalTo(0L)

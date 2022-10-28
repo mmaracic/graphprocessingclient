@@ -2,6 +2,7 @@ package hr.mmaracic.graphpr.service.age;
 
 import hr.mmaracic.graphpr.dao.age.AgeDao;
 import hr.mmaracic.graphpr.model.csv.LineEntry;
+import hr.mmaracic.graphpr.model.csv.VoyageEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.service.GraphDataService;
@@ -27,14 +28,14 @@ public class AgeGraphDataService implements GraphDataService {
     }
 
     @Override
-    public void saveStopsAndLines(List<LineEntry> entries, int version) {
-        Set<StopNode> stops = extractStops(entries);
+    public void saveStopsAndLines(List<LineEntry> lineEntryList, List<VoyageEntry> voyageEntryList, int version) {
+        Set<StopNode> stops = extractStops(lineEntryList);
         ageDao.saveAll(stops);
 
-        List<LineNode> lines = extractLineNodes(entries, stops, version);
+        List<LineNode> lines = extractLineNodes(lineEntryList, voyageEntryList, stops, version);
         ageDao.saveAll(lines);
 
-        addNextStopsToStopsAndLines(entries, stops, version);
+        addNextStopsToStopsAndLines(lineEntryList, stops, version);
         ageDao.saveAll(stops);
     }
 

@@ -1,6 +1,7 @@
 package hr.mmaracic.graphpr.service.neo4j;
 
 import hr.mmaracic.graphpr.model.csv.LineEntry;
+import hr.mmaracic.graphpr.model.csv.VoyageEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.repository.LineNodeRepository;
@@ -29,15 +30,15 @@ public class Neo4jGraphDataService implements GraphDataService {
         stopNodeRepository.deleteAll();
     }
 
-    public void saveStopsAndLines(List<LineEntry> entries, int version) {
-        Set<StopNode> stops = extractStops(entries);
+    public void saveStopsAndLines(List<LineEntry> lineEntryList, List<VoyageEntry> voyageEntryList, int version) {
+        Set<StopNode> stops = extractStops(lineEntryList);
         stopNodeRepository.saveAll(stops);
 
 
-        List<LineNode> lines = extractLineNodes(entries, stops, version);
+        List<LineNode> lines = extractLineNodes(lineEntryList, voyageEntryList, stops, version);
         lineNodeRepository.saveAll(lines);
 
-        addNextStopsToStopsAndLines(entries, stops, version);
+        addNextStopsToStopsAndLines(lineEntryList, stops, version);
         stopNodeRepository.saveAll(stops);
     }
 

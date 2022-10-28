@@ -2,6 +2,7 @@ package hr.mmaracic.graphpr;
 
 import hr.mmaracic.graphpr.dao.neo4j.StopNodeDao;
 import hr.mmaracic.graphpr.model.csv.LineEntry;
+import hr.mmaracic.graphpr.model.csv.VoyageEntry;
 import hr.mmaracic.graphpr.model.graph.LineNode;
 import hr.mmaracic.graphpr.model.graph.StopNode;
 import hr.mmaracic.graphpr.repository.LineNodeRepository;
@@ -78,8 +79,9 @@ class Graph4jGraphTest extends AbstractGraph4jTest {
 
     private void loadData() throws IOException {
         int version = 1;
-        List<LineEntry> entries = csvDataService.getCsvData("data/zet_linije_stops.csv");
-        neo4jGraphDataService.saveStopsAndLines(entries, version);
+        List<LineEntry> lineEntryList = csvDataService.getCsvLineEntries("data/zet_linije_stops.csv");
+        List<VoyageEntry> voyageEntries = csvDataService.getCsvVoyageEntries("data/zet_linije_voyages.csv");
+        neo4jGraphDataService.saveStopsAndLines(lineEntryList, voyageEntries, version);
     }
 
 }
